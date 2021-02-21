@@ -20,7 +20,15 @@ class UsersController extends Controller
     }
 
     public function store(Request $request)
-    {   
+    {
+        $validated = $request->validate([
+            'name' => 'required|min:3',
+            'email' => 'required|unique:users',
+            'phone' => 'required|size:14',
+            'address' => 'required:min:9',
+            'zip' => 'required|size:5',
+        ]);
+
         DB::beginTransaction();
 
         try {
@@ -30,7 +38,7 @@ class UsersController extends Controller
             {
                 foreach ($request->file('images') as $image) {
                     $name = $image->getClientOriginalName();
-                    $path = public_path() . '/images/';
+                    $path = public_path() . '/uploads/images/' . $user->id . "/";
                     $image->move($path, $name);
                     Image::create([
                         'user_id' => $user->id,
